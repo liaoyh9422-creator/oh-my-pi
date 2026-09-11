@@ -2,6 +2,7 @@ import { type ResolvedThinkingLevel, ThinkingLevel } from "@oh-my-pi/pi-agent-co
 import { Effort, type Model, THINKING_EFFORTS } from "@oh-my-pi/pi-ai";
 import { clampThinkingLevelForModel, getSupportedEfforts } from "@oh-my-pi/pi-catalog/model-thinking";
 import { modelsAreEqual } from "@oh-my-pi/pi-catalog/models";
+import { t } from "./i18n";
 
 export { CLI_THINKING_LEVELS } from "./cli/thinking-levels";
 
@@ -93,7 +94,23 @@ export function parseThinkingLevel(value: string | null | undefined): ThinkingLe
  * Returns display metadata for a thinking selector.
  */
 export function getThinkingLevelMetadata(level: ThinkingLevel): ThinkingLevelMetadata {
-	return THINKING_LEVEL_METADATA[level];
+	const meta = THINKING_LEVEL_METADATA[level];
+	if (!meta) return meta;
+	const descKeyMap: Partial<Record<ThinkingLevel, string>> = {
+		[ThinkingLevel.Inherit]: "thinking.inherit",
+		[ThinkingLevel.Off]: "thinking.off",
+		[ThinkingLevel.Minimal]: "thinking.min",
+		[ThinkingLevel.Low]: "thinking.low",
+		[ThinkingLevel.Medium]: "thinking.medium",
+		[ThinkingLevel.High]: "thinking.high",
+		[ThinkingLevel.XHigh]: "thinking.xhigh",
+		[ThinkingLevel.Max]: "thinking.max",
+	};
+	const key = descKeyMap[level];
+	return {
+		...meta,
+		description: key ? t(key, meta.description) : meta.description,
+	};
 }
 
 /**

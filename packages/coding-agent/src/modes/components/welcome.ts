@@ -8,6 +8,7 @@ import {
 	wrapTextWithAnsi,
 } from "@oh-my-pi/pi-tui";
 import { APP_NAME } from "@oh-my-pi/pi-utils";
+import { t } from "../../i18n";
 import { theme } from "../../modes/theme/theme";
 import tipsText from "./tips.txt" with { type: "text" };
 
@@ -83,7 +84,7 @@ function renderNewTag(phase: number, encoding: ColorEncoding): string {
 	return out + reset;
 }
 export function renderWelcomeTip(tip: string, boxWidth: number, phase = 0): string[] {
-	const label = "Tip: ";
+	const label = "提示: ";
 	const labelWidth = visibleWidth(label);
 	const bodyBudget = boxWidth - 1 - labelWidth; // 1 = leading indent
 	if (bodyBudget < 8) return [];
@@ -297,7 +298,7 @@ export class WelcomeComponent implements Component {
 		// Left column - centered content
 		const leftLines = [
 			"",
-			this.#centerText(theme.bold("Welcome back!"), leftCol),
+			this.#centerText(theme.bold(t("welcome.welcome_back", "欢迎回来！")), leftCol),
 			"",
 			...logoColored.map(l => this.#centerText(l, leftCol)),
 			"",
@@ -312,7 +313,7 @@ export class WelcomeComponent implements Component {
 		// Recent sessions content
 		const sessionLines: string[] = [];
 		if (this.recentSessions.length === 0) {
-			sessionLines.push(` ${theme.fg("dim", "No recent sessions")}`);
+			sessionLines.push(` ${theme.fg("dim", t("welcome.no_sessions", "暂无历史会话"))}`);
 		} else {
 			// Reserve width for the bullet prefix (" • ") and the trailing " (timeAgo)"
 			// so the relative time is never the part that gets truncated. The name
@@ -338,7 +339,7 @@ export class WelcomeComponent implements Component {
 		// LSP servers content
 		const lspLines: string[] = [];
 		if (this.lspServers.length === 0) {
-			lspLines.push(` ${theme.fg("dim", "No LSP servers")}`);
+			lspLines.push(` ${theme.fg("dim", t("welcome.no_lsp", "暂无 LSP 服务"))}`);
 		} else {
 			for (const server of this.lspServers.slice(0, WELCOME_LSP_SLOTS)) {
 				const icon =
@@ -360,16 +361,16 @@ export class WelcomeComponent implements Component {
 
 		// Right column
 		const rightLines = [
-			` ${theme.bold(theme.fg("accent", "Tips"))}`,
-			` ${theme.fg("dim", "#")}${theme.fg("muted", " for prompt actions")}`,
-			` ${theme.fg("dim", "/")}${theme.fg("muted", " for commands")}`,
-			` ${theme.fg("dim", "!")}${theme.fg("muted", " to run bash")}`,
-			` ${theme.fg("dim", "$")}${theme.fg("muted", " to run python")}`,
+			` ${theme.bold(theme.fg("accent", "常用提示"))}`,
+			` ${theme.fg("dim", "#")}${theme.fg("muted", " 触发快捷操作")}`,
+			` ${theme.fg("dim", "/")}${theme.fg("muted", " 查看所有命令")}`,
+			` ${theme.fg("dim", "!")}${theme.fg("muted", " 执行终端命令")}`,
+			` ${theme.fg("dim", "$")}${theme.fg("muted", " 执行 Python 代码")}`,
 			separator,
-			` ${theme.bold(theme.fg("accent", "LSP Servers"))}`,
+			` ${theme.bold(theme.fg("accent", "语言服务器 (LSP)"))}`,
 			...lspLines,
 			separator,
-			` ${theme.bold(theme.fg("accent", "Recent sessions"))}`,
+			` ${theme.bold(theme.fg("accent", "最近会话"))}`,
 			...sessionLines,
 			"",
 		];

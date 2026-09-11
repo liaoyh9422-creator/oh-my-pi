@@ -1,13 +1,14 @@
 import { routeSelectListMouse, type SelectItem, SelectList, type SgrMouseEvent } from "@oh-my-pi/pi-tui";
 import type { ComposerShape } from "../../../config/settings-schema";
+import { t } from "../../../i18n";
 import { renderComposerShapePreview } from "../../components/composer-shape-preview";
 import { getComposerShapeOptions } from "../../components/composer-shape-registry";
 import { getSelectListTheme, theme } from "../../theme/theme";
 import type { SetupScene, SetupSceneController, SetupSceneHost } from "./types";
 
 class ComposerSceneController implements SetupSceneController {
-	title = "Choose composer shape";
-	subtitle = "Pick the prompt and status line layout for your workflow.";
+	title = t("setup.composer_title", "Choose composer shape");
+	subtitle = t("setup.composer_subtitle", "Pick the prompt and status line layout for your workflow.");
 	#selectList: SelectList;
 	#shapes: readonly ComposerShape[];
 	#items: readonly SelectItem[];
@@ -96,7 +97,7 @@ class ComposerSceneController implements SetupSceneController {
 
 export const composerSetupScene: SetupScene = {
 	id: "composer-shape",
-	title: "Choose composer shape",
+	title: t("setup.composer_title", "Choose composer shape"),
 	minVersion: 2,
 	mount: host => new ComposerSceneController(host),
 };

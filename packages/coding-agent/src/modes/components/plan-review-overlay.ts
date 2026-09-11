@@ -30,6 +30,7 @@ import {
 	visibleWidth,
 } from "@oh-my-pi/pi-tui";
 import { sanitizeText } from "@oh-my-pi/pi-utils";
+import { t } from "../../i18n";
 import { sanitizeStatusText } from "../shared";
 import { getMarkdownTheme, theme } from "../theme/theme";
 import {
@@ -54,7 +55,7 @@ import { joinPlanSections, parsePlanSections, sectionDeletionSpan } from "./plan
 import { renderSegmentTrack } from "./segment-track";
 
 /** Title shown in the overlay's top border. */
-const OVERLAY_TITLE = "Plan Review";
+const OVERLAY_TITLE = t("plan.overlay_title", "Plan Review");
 /** Minimum plan-body rows kept visible even on short terminals. */
 const MIN_BODY_ROWS = 3;
 /** Sidebar gates: enough headings, a wide terminal, and a usable body column. */
@@ -155,7 +156,7 @@ export interface PlanReviewOverlayOptions {
 }
 
 /** Default trailing footer hint when the caller supplies none. */
-const DEFAULT_HELP_SUFFIX = "esc cancel";
+const DEFAULT_HELP_SUFFIX = t("plan.default_help_suffix", "esc cancel");
 
 export class PlanReviewOverlay implements Component {
 	#mdTheme: MarkdownTheme;
@@ -938,19 +939,19 @@ export class PlanReviewOverlay implements Component {
 		const parts: string[] = [];
 		switch (this.#focus) {
 			case "actions":
-				parts.push("↑↓ select", "⏎ confirm");
-				if (this.#slider) parts.push("◂▸ model");
+				parts.push(`↑↓ ${t("plan.help_select", "select")}`, `⏎ ${t("plan.help_confirm", "confirm")}`);
+				if (this.#slider) parts.push(`◂▸ ${t("plan.help_model", "model")}`);
 				break;
 			case "toc":
-				parts.push("↑↓ section", "⏎ open", "a annotate", "d delete", "u undo");
+				parts.push(`↑↓ ${t("plan.help_section", "section")}`, `⏎ ${t("plan.help_open", "open")}`, `a ${t("plan.help_annotate", "annotate")}`, `d ${t("plan.help_delete", "delete")}`, `u ${t("plan.help_undo", "undo")}`);
 				break;
 			case "body":
-				parts.push("↑↓ scroll", "⇧ faster", "pgup/pgdn", "g/G ends", "a annotate");
+				parts.push(`↑↓ ${t("plan.help_scroll", "scroll")}`, `⇧ ${t("plan.help_faster", "faster")}`, "pgup/pgdn", `g/G ${t("plan.help_ends", "ends")}`, `a ${t("plan.help_annotate", "annotate")}`);
 				break;
 		}
-		if (this.callbacks.onCopyPlan) parts.push("c copy");
-		parts.push("tab regions");
-		if (this.#externalEditorLabel && this.#focus !== "toc") parts.push(`${this.#externalEditorLabel} editor`);
+		if (this.callbacks.onCopyPlan) parts.push(`c ${t("plan.help_copy", "copy")}`);
+		parts.push(`tab ${t("plan.help_regions", "regions")}`);
+		if (this.#externalEditorLabel && this.#focus !== "toc") parts.push(`${this.#externalEditorLabel} ${t("plan.help_editor", "editor")}`);
 		parts.push(this.#helpSuffix);
 		return parts.join(sep);
 	}
@@ -1124,7 +1125,7 @@ export class PlanReviewOverlay implements Component {
 		const indent = " ".repeat(Math.max(0, section.level - this.#tocBaseLevel));
 		const ann = section.annotations.length > 0 ? " ✎" : "";
 		const avail = Math.max(0, width - 1 - indent.length - visibleWidth(ann));
-		const title = truncateToWidth(section.title || "(untitled)", avail, Ellipsis.Unicode);
+		const title = truncateToWidth(section.title || t("plan.untitled", "(untitled)"), avail, Ellipsis.Unicode);
 		const body = indent + title + ann;
 		// Single-column gutter glyph: a cursor `›` on the focused selection, an
 		// accent bar `▎` on the current scrolled section, otherwise blank. The
@@ -1141,18 +1142,18 @@ export class PlanReviewOverlay implements Component {
 		if (this.#annotating) {
 			const target = this.#annotationTarget;
 			const section = target ? this.#sections[target.sectionIndex] : undefined;
-			const title = sanitizeStatusText(section?.title || "Plan preamble");
+			const title = sanitizeStatusText(section?.title || t("plan.preamble", "Plan preamble"));
 			const location =
 				target?.row === null
 					? `‹${title}›`
 					: `‹${title}› · ${truncateToWidth(target?.context ?? "", Math.max(1, innerWidth - 16), Ellipsis.Unicode)}`;
 			const caption = truncateToWidth(
-				`${theme.fg("dim", "Annotate")} ${theme.fg("accent", location)}`,
+				`${theme.fg("dim", t("plan.annotate", "Annotate"))} ${theme.fg("accent", location)}`,
 				innerWidth,
 				Ellipsis.Unicode,
 			);
-			const hintParts = ["enter save", "esc cancel"];
-			if (this.#externalEditorLabel) hintParts.push(`${this.#externalEditorLabel} editor`);
+			const hintParts = [t("plan.enter_save", "enter save"), t("plan.esc_cancel", "esc cancel")];
+			if (this.#externalEditorLabel) hintParts.push(`${this.#externalEditorLabel} ${t("plan.help_editor", "editor")}`);
 			return [caption, this.#input.render(innerWidth)[0] ?? "", theme.fg("dim", hintParts.join(" · "))];
 		}
 		return [theme.fg("dim", this.#buildHelp())];
@@ -1168,11 +1169,11 @@ export class PlanReviewOverlay implements Component {
 
 		const committed = this.#committed;
 		const sliderLines = committed ? [] : this.#renderSliderLines();
-		const submittingLabel = this.#committedLabel ? `${this.#committedLabel} — submitting…` : "Submitting…";
+		const submittingLabel = this.#committedLabel ? `${this.#committedLabel} — ${t("plan.submitting", "submitting…")}` : t("plan.submitting_ellipsis", "Submitting…");
 		const optionLines = committed ? [theme.bold(theme.fg("accent", submittingLabel))] : this.#renderOptionLines();
 		const promptLines = this.#promptTitle ? [theme.bold(theme.fg("accent", this.#promptTitle))] : [];
 		const footerLines = committed
-			? [theme.fg("dim", "Applying your selection — this can take a moment while context is prepared.")]
+			? [theme.fg("dim", t("plan.applying_selection", "Applying your selection — this can take a moment while context is prepared."))]
 			: this.#renderFooterLines(innerWidth);
 
 		// Chrome rows: top border, two dividers, bottom border, plus the

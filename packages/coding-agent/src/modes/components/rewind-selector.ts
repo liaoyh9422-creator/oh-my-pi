@@ -35,6 +35,7 @@ import {
 } from "@oh-my-pi/pi-tui";
 import type { MessageRenderer } from "../../extensibility/extensions/types";
 import type { SessionMessageEntry } from "../../session/session-entries";
+import { t } from "../../i18n";
 import { theme } from "../theme/theme";
 import {
 	matchesAppToolsExpand,
@@ -401,13 +402,13 @@ export class RewindSelectorComponent implements Component {
 		const output: string[] = [];
 		output.push(...this.#border.render(width));
 		output.push(
-			` ${theme.icon.rewind} ${theme.bold("Rewind")}${theme.sep.dot}${theme.fg("dim", "pick the point to continue from")}`,
+			` ${theme.icon.rewind} ${theme.bold(t("rewind.title", "Rewind"))}${theme.sep.dot}${theme.fg("dim", t("rewind.subtitle", "pick the point to continue from"))}`,
 		);
 		output.push(...this.#border.render(width));
 		output.push(...this.#scrollView.render(width));
 		const position = this.#targets.length > 0 ? `${this.#selected + 1}/${this.#targets.length}  ` : "";
-		const lateral = columns.length > 0 ? "←/→ branches" : "←/→ user turns";
-		output.push(` ${theme.fg("dim", `${position}↑/↓ step  ${lateral}  enter rewind  ctrl+o expand  esc cancel`)}`);
+		const lateral = columns.length > 0 ? t("rewind.branches", "←/→ branches") : t("rewind.turns", "←/→ user turns");
+		output.push(` ${theme.fg("dim", `${position}${t("rewind.step", "↑/↓ step")}  ${lateral}  ${t("rewind.enter_rewind", "enter rewind")}  ${t("rewind.expand", "ctrl+o expand")}  ${t("rewind.cancel", "esc cancel")}`)}`);
 		output.push(...this.#border.render(width));
 		return output;
 	}
@@ -440,7 +441,7 @@ export class RewindSelectorComponent implements Component {
 				suffixTargets,
 				this.#activeVariant === 0 ? 0 : -1,
 				colWidth,
-				this.#columnHeader(0, count, "current", colWidth),
+				this.#columnHeader(0, count, t("rewind.current", "current"), colWidth),
 			),
 		];
 		for (let index = 0; index < columns.length; index++) {

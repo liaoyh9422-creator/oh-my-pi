@@ -437,7 +437,7 @@ export class SettingsList implements Component {
 
 	#renderSearchStatus(width: number): string {
 		const query = sanitizeSingleLine(this.#filterQuery);
-		const statusText = query ? `  Search: ${query}` : "  Type to search";
+		const statusText = query ? `  搜索: ${query}` : "  输入关键词以搜索";
 		return this.#theme.hint(truncateToWidth(statusText, width, Ellipsis.Omit));
 	}
 
@@ -568,9 +568,9 @@ export class SettingsList implements Component {
 			if (this.#shouldRenderSearchStatus()) {
 				lines.push(this.#renderSearchStatus(width));
 			}
-			lines.push(this.#theme.hint("  No matching settings"));
+			lines.push(this.#theme.hint("  未找到匹配的设置项"));
 			lines.push("");
-			lines.push(truncateToWidth(this.#theme.hint("  Backspace to edit search · Esc to cancel"), width));
+			lines.push(truncateToWidth(this.#theme.hint("  Backspace 编辑搜索 · Esc 取消"), width));
 			return lines;
 		}
 
@@ -661,8 +661,8 @@ export class SettingsList implements Component {
 		// Add hint (suppressed entirely when the host owns the footer)
 		if (this.#options.hint !== "") {
 			lines.push("");
-			const jumpHint = sections.length >= 2 ? "PgUp/PgDn to jump sections · " : "";
-			const hintText = this.#options.hint ?? `Enter/Space to change · ${jumpHint}Type to search · Esc to cancel`;
+			const jumpHint = sections.length >= 2 ? "PgUp/PgDn 跳转分组 · " : "";
+			const hintText = this.#options.hint ?? `Enter/空格 切换 · ${jumpHint}输入搜索 · Esc 取消`;
 			lines.push(truncateToWidth(this.#theme.hint(`  ${hintText}`), width));
 		}
 

@@ -35,16 +35,17 @@ import {
 } from "../utils/keybinding-matchers";
 import { CountdownTimer } from "./countdown-timer";
 import { editorKey } from "./keybinding-hints";
+import { t } from "../../i18n";
 import { bottomBorder, divider, row, topBorder } from "./overlay-box";
 import { handleTabSwitchKey } from "./selector-helpers";
 
-const OTHER_OPTION = "Other (type your own)";
-const SUBMIT_OPTION = "Submit";
+const OTHER_OPTION = t("ask.other", "Other (type your own)");
+const SUBMIT_OPTION = t("ask.submit", "Submit");
 
 // Action rows appended by the guest race participant. An option sanitizing
 // to one of these must disambiguate identically on both sides, or the same
 // question renders different rows depending on who answers.
-const GUEST_ACTION_LABELS = ["Chat about this", "Next →"];
+const GUEST_ACTION_LABELS = [t("ask.chat", "Chat about this"), t("ask.next", "Next →")];
 
 /** Fraction of the terminal the dialog may occupy. The box height is fixed
  *  at spawn from the tallest tab's content (re-measured only on viewport

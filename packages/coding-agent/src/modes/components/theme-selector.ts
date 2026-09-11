@@ -1,4 +1,5 @@
 import { type SelectItem, SelectList, type SgrMouseEvent } from "@oh-my-pi/pi-tui";
+import { t } from "../../i18n";
 import { getSelectListTheme } from "../../modes/theme/theme";
 import { OverlayPanel } from "./overlay-box";
 import { routeSelectListMouseWithTopBorder } from "./select-list-mouse-routing";
@@ -18,14 +19,14 @@ export class ThemeSelectorComponent extends OverlayPanel {
 		onCancel: () => void,
 		onPreview: (themeName: string) => void,
 	) {
-		super("Theme");
+		super(t("theme.title", "Theme"));
 		this.#onPreview = onPreview;
 
 		// Create select items from provided themes
 		const themeItems: SelectItem[] = themes.map(name => ({
 			value: name,
 			label: name,
-			description: name === currentTheme ? "(current)" : undefined,
+			description: name === currentTheme ? t("theme.current", "(current)") : undefined,
 		}));
 
 		// Create selector

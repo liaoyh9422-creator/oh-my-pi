@@ -9,6 +9,7 @@ import {
 	truncateToWidth,
 	visibleWidth,
 } from "@oh-my-pi/pi-tui";
+import { t } from "../../i18n";
 import { theme } from "../../modes/theme/theme";
 import {
 	matchesAppInterrupt,
@@ -101,7 +102,7 @@ class HistoryResultsList implements Component {
 		const lines: string[] = [];
 
 		if (this.#results.length === 0) {
-			const message = this.#tokens.length > 0 ? "No matching history" : "No history yet";
+			const message = this.#tokens.length > 0 ? t("history.no_match", "No matching history") : t("history.empty", "No history yet");
 			lines.push(theme.fg("muted", `  ${theme.status.info} ${message}`));
 			return lines;
 		}
@@ -158,7 +159,7 @@ export class HistorySearchComponent extends OverlayPanel {
 	#resultLimit = 100;
 
 	constructor(historyStorage: HistoryStorage, onSelect: (prompt: string) => void, onCancel: () => void) {
-		super("History");
+		super(t("history.title", "History"));
 		this.#historyStorage = historyStorage;
 		this.#onSelect = onSelect;
 		this.#onCancel = onCancel;
@@ -177,7 +178,7 @@ export class HistorySearchComponent extends OverlayPanel {
 		this.#resultsList = new HistoryResultsList();
 
 		const dot = theme.fg("dim", theme.sep.dot);
-		const hint = [rawKeyHint("↑↓", "navigate"), rawKeyHint("enter", "select"), rawKeyHint("esc", "cancel")].join(dot);
+		const hint = [rawKeyHint("↑↓", t("history.hint_nav", "navigate")), rawKeyHint("enter", t("history.hint_select", "select")), rawKeyHint("esc", t("history.hint_cancel", "cancel"))].join(dot);
 
 		this.addChild(new Spacer(1));
 		this.addChild(this.#searchInput);

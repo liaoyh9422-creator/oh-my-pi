@@ -19,17 +19,18 @@ import {
 	setSymbolPreset,
 	theme,
 } from "../../theme/theme";
+import { t } from "../../../i18n";
 import type { SetupScene, SetupSceneController, SetupSceneHost } from "./types";
 
 type ThemeMode = "curated" | "all";
 
 const CURATED_ITEMS: readonly SelectItem[] = [
-	{ value: "auto", label: "Match terminal", description: "Titanium in dark terminals, Light in light terminals" },
-	{ value: "theme:titanium", label: "Titanium", description: "Default dark theme" },
-	{ value: "theme:light", label: "Light", description: "Default light theme" },
-	{ value: "colorblind", label: "Colorblind colors", description: "Adjust red/green contrast" },
-	{ value: "ansi", label: "ANSI-safe", description: "ASCII glyphs with the dark terminal theme" },
-	{ value: "browse", label: "Browse all…", description: "Show every built-in and custom theme" },
+	{ value: "auto", label: "Match terminal", description: t("setup.theme_auto_desc", "Titanium in dark terminals, Light in light terminals") },
+	{ value: "theme:titanium", label: "Titanium", description: t("setup.theme_titanium_desc", "Default dark theme") },
+	{ value: "theme:light", label: "Light", description: t("setup.theme_light_desc", "Default light theme") },
+	{ value: "colorblind", label: "Colorblind colors", description: t("setup.theme_colorblind_desc", "Adjust red/green contrast") },
+	{ value: "ansi", label: "ANSI-safe", description: t("setup.theme_ansi_desc", "ASCII glyphs with the dark terminal theme") },
+	{ value: "browse", label: "Browse all…", description: t("setup.theme_browse_desc", "Show every built-in and custom theme") },
 ];
 
 function fitLine(line: string, width: number): string {
@@ -65,8 +66,8 @@ function renderMockEditor(width: number): string[] {
 	const horizontal = box.horizontal.repeat(innerWidth);
 	const top = theme.fg("borderAccent", `${box.topLeft}${horizontal}${box.topRight}`);
 	const bottom = theme.fg("borderMuted", `${box.bottomLeft}${horizontal}${box.bottomRight}`);
-	const prompt = `${theme.fg("accent", ">")} ${theme.fg("text", "Ask anything, edit files, run tools")}${theme.inverse(" ")}`;
-	const hint = theme.fg("dim", "enter send · shift+enter newline · / commands");
+	const prompt = `${theme.fg("accent", ">")} ${theme.fg("text", t("setup.mock_prompt", "Ask anything, edit files, run tools"))}${theme.inverse(" ")}`;
+	const hint = theme.fg("dim", t("setup.mock_hint", "enter send · shift+enter newline · / commands"));
 	return [
 		top,
 		`${theme.fg("borderAccent", box.vertical)}${fitLine(prompt, innerWidth)}${theme.fg("borderAccent", box.vertical)}`,
@@ -78,19 +79,19 @@ function renderMockEditor(width: number): string[] {
 function renderThemePreview(width: number): string[] {
 	const previewWidth = Math.max(24, Math.min(width, 88));
 	return [
-		theme.bold("Preview"),
+		theme.bold(t("setup.preview", "Preview")),
 		`${theme.fg("success", `${theme.status.success} success`)}  ${theme.fg("warning", `${theme.status.warning} warning`)}  ${theme.fg("error", `${theme.status.error} error`)}  ${theme.fg("accent", "accent")}`,
 		"",
-		theme.fg("muted", "Status line"),
+		theme.fg("muted", t("setup.status_line", "Status line")),
 		renderMockStatusLine(previewWidth),
-		theme.fg("muted", "Editor"),
+		theme.fg("muted", t("setup.editor", "Editor")),
 		...renderMockEditor(previewWidth),
 	];
 }
 
 class ThemeSceneController implements SetupSceneController {
-	title = "Pick a theme";
-	subtitle = "Move through the list to preview; Enter saves the highlighted choice.";
+	title = t("setup.theme_title", "Pick a theme");
+	subtitle = t("setup.theme_subtitle", "Move through the list to preview; Enter saves the highlighted choice.");
 	#mode: ThemeMode = "curated";
 	#selectList: SelectList;
 	#loadingAllThemes = false;
@@ -324,7 +325,7 @@ class ThemeSceneController implements SetupSceneController {
 
 export const themeSetupScene: SetupScene = {
 	id: "theme",
-	title: "Pick a theme",
+	title: t("setup.theme_title", "Pick a theme"),
 	minVersion: 1,
 	mount: host => new ThemeSceneController(host),
 };

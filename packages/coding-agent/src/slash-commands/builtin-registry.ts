@@ -15,6 +15,7 @@ import { BUILTIN_MARKETPLACE_SLASH_COMMANDS, reloadTuiPluginState } from "./buil
 import { BUILTIN_MODE_SLASH_COMMANDS } from "./builtin-modes";
 import { BUILTIN_SESSION_SLASH_COMMANDS } from "./builtin-session";
 import { parseSlashCommand } from "./helpers/parse";
+import { t } from "../i18n";
 import type {
 	BuiltinSlashCommand,
 	ParsedSlashCommand,
@@ -60,10 +61,13 @@ export const BUILTIN_SLASH_COMMAND_DEFS: ReadonlyArray<BuiltinSlashCommand> = BU
 		name: command.name,
 		aliases: command.aliases,
 		allowArgs: command.allowArgs === true,
-		description: command.description,
+		description: t(`slash.${command.name}.desc`, command.description),
 		icon: command.icon,
-		subcommands: command.subcommands,
-		inlineHint: command.inlineHint,
+		subcommands: command.subcommands?.map(sub => ({
+			...sub,
+			description: t(`slash.${command.name}.${sub.name}.desc`, sub.description),
+		})),
+		inlineHint: command.inlineHint ? t(`slash.${command.name}.hint`, command.inlineHint) : undefined,
 		getTuiAutocompleteDescription: command.getTuiAutocompleteDescription,
 	}),
 );

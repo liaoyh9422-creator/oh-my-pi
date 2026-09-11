@@ -1,4 +1,5 @@
 import { routeSelectListMouse, type SelectItem, SelectList, type SgrMouseEvent } from "@oh-my-pi/pi-tui";
+import { t } from "../../../i18n";
 import { getSelectListTheme, type SymbolPreset, setSymbolPreset, theme } from "../../theme/theme";
 import type { SetupScene, SetupSceneController, SetupSceneHost } from "./types";
 
@@ -24,8 +25,8 @@ const GLYPH_ITEMS: readonly SelectItem[] = GLYPH_PRESETS.map((preset, index) => 
 }));
 
 class GlyphSceneController implements SetupSceneController {
-	title = "Choose glyph mode";
-	subtitle = "Pick the row that renders cleanly in your terminal.";
+	title = t("setup.glyph_title", "Choose glyph mode");
+	subtitle = t("setup.glyph_subtitle", "Pick the row that renders cleanly in your terminal.");
 	#selectList: SelectList;
 	#previewRequest = 0;
 	#committing = false;
@@ -97,7 +98,7 @@ class GlyphSceneController implements SetupSceneController {
 
 export const glyphSetupScene: SetupScene = {
 	id: "glyph-mode",
-	title: "Choose glyph mode",
+	title: t("setup.glyph_title", "Choose glyph mode"),
 	minVersion: 1,
 	mount: host => new GlyphSceneController(host),
 };

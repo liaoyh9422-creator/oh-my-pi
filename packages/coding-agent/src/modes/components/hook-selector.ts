@@ -20,6 +20,7 @@ import {
 	wrapTextWithAnsi,
 } from "@oh-my-pi/pi-tui";
 import { getMarkdownTheme, type ThemeColor, theme } from "../../modes/theme/theme";
+import { t } from "../../i18n";
 import {
 	matchesAppExternalEditor,
 	matchesSelectCancel,
@@ -259,7 +260,7 @@ export class HookSelectorComponent extends OverlayPanel {
 			this.addChild(this.#listContainer);
 		}
 		this.addChild(new Spacer(1));
-		const controlsHint = opts?.helpText ?? "up/down navigate  enter select  esc cancel";
+		const controlsHint = opts?.helpText ?? t("hook.controls_hint", "up/down navigate  enter select  esc cancel");
 		this.addChild(new Text(theme.fg("dim", controlsHint), 0, 0));
 		this.addChild(new Spacer(1));
 
@@ -600,7 +601,7 @@ export class HookSelectorComponent extends OverlayPanel {
 			this.#searchQuery.trim() && total !== this.#options.length
 				? `${selectedCount}/${total} of ${this.#options.length}`
 				: `${selectedCount}/${total}`;
-		const suffix = this.#searchQuery.trim() ? `  Search: ${this.#searchQuery}` : "  Type to search";
+		const suffix = this.#searchQuery.trim() ? `  ${t("hook.search", "Search: ")}${this.#searchQuery}` : t("hook.type_to_search", "  Type to search");
 		return theme.fg("dim", `  (${count})${suffix}`);
 	}
 

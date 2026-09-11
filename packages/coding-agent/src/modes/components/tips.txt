@@ -1,27 +1,27 @@
-Tired of typing "keep going"? Just send a '.'
-You can /btw to ask a side question
-Use /tan to fork the current conversation into a background agent
-Ctrl+D can be used to exit, but with your draft saved!
-Find out which model you emotionally abuse the most with `omp stats`
-Try task isolation to create CoW worktrees
-Need a cheap nested model call? Use `completion(x...)`. Have a big batch of tasks? Ask clanker to use it!
-Spaghetti code? Try complaining with /omfg
-Did you know? Each kitty/tmux/cmux/zellij/wezterm split keeps its own session — `omp -c` resumes the right one
-Drop the word `ultrathink` in your message for harder multi-step reasoning — watch it glow rainbow as you type
-Say `orchestrate` in your message to drive a multi-phase task with parallel subagents — watch it glow as you type
-Say `workflowz` in your message to drive the task with parallel subagents in eval — watch it glow as you type
-Log in to several accounts of the same provider — `/login` again — and omp load-balances across them automatically
-Run `omp auth-broker serve` once and every machine pulls live tokens over the wire — refresh keys never leave the host; `omp auth-gateway` fronts it as a drop-in proxy any OpenAI-compatible client can hit
-Press alt+p (or /switch) to switch provider, and ctrl+p to cycle role models smol -> slow -> etc
-Press ctrl+r to search your prompt history and reuse a past message
-`/force read` pins the next turn to one specific tool when the model keeps reaching for the wrong one
-`/copy code` grabs the last code block to your clipboard — `/copy cmd` grabs the last shell/python command
-`/shake` rips heavy tool results out of context to reclaim tokens without a full /compact — `/shake images` drops just images
-Pair up live: `/collab` shares your session through an end-to-end encrypted relay link — a teammate runs `/join <link>` to watch tool calls stream and prompt the agent from their own omp
-Press ← ← to drill into a running or finished agent and inspect its tool calls and transcript
-Hit a Codex rate limit? `/usage reset` spends a saved reset credit to immediately restore your quota
-No native tool_calling? Inference provider botches parsing them? `PI_DIALECT=glm|kimi|anthropic…` rolls it locally for them!
-Turn on `/advisor` to attach a second model that reviews every turn and quietly injects advice
-Try starting your prompt with a ->, and writing a list (1. Do X, 2. Do Y)
-Press shift+tab to cycle through reasoning effort levels
-Lint/type errors piling up? `omp cleanse` (or /cleanse right here) hunts project diagnostics and fixes them with parallel subagents — esc cancels
+懒得一遍遍输入“继续”？直接发送一个句号 '.' 即可
+您可以使用 /btw 临时插话提问，不打断主线对话任务
+使用 /tan 可将当前对话分支拆分到后台 Agent 异步运行
+按 Ctrl+D 随时安全退出，且系统会自动为您保存输入草稿！
+运行 `omp stats` 查看您最常用（或消耗最多 Token）的模型统计
+尝试任务隔离机制（Task Isolation），自动为您创建写时复制 (CoW) 工作树
+需要轻量嵌套模型调用？使用 `completion(x...)`；大批量并行任务可让 Agent 调度执行！
+遇到乱成一团的“面条代码”？试着输入 /omfg 吐个槽
+小知识：每个 tmux/wezterm/zellij 窗口会独立记录会话，输入 `omp -c` 可精准恢复对应会话
+在消息中包含 `ultrathink` 关键词可触发深层多步推理——输入时还会闪烁彩虹动效
+在消息中包含 `orchestrate` 关键词可驱动多阶段子 Agent 并行任务编排
+在消息中包含 `workflowz` 关键词可在评测中通过并行子 Agent 驱动任务
+同一模型服务商支持绑定多个账号（再次运行 `/login`），omp 会自动在它们之间进行负载均衡
+运行 `omp auth-broker serve`，所有机器可通过内网安全获取 Token；`omp auth-gateway` 可作为标准代理转发请求
+按 Alt+P（或输入 /switch）切换模型服务商；按 Ctrl+P 在快速模型与深度模型间轮转
+按 Ctrl+R 搜索历史提示词与对话记录，一键复用历史指令
+当模型屡次选错工具时，使用 `/force read` 可强制下一轮交互调用指定工具
+使用 `/copy code` 快速将最后一个代码块复制到剪贴板；`/copy cmd` 复制最后执行的终端命令
+输入 `/shake` 可从上下文中剔除冗长的工具输出以节省 Token；`/shake images` 仅移除图片
+实时结对协作：输入 `/collab` 通过加密链接分享会话，队友运行 `/join <link>` 即可同步协作
+连续按两次左方向键 ← ←，可下钻查看正在运行或已完成的 Agent 工具调用日志与详细记录
+遇到速率限制或配额耗尽？输入 `/usage reset` 消耗重置额度立即恢复使用配额
+服务商不支持原生 Tool Call？设置 `PI_DIALECT=glm|kimi|anthropic…` 即可在本地自动完成协议兼容！
+开启 `/advisor` 顾问功能，引入第二模型实时审查每轮交互并静默注入优化建议
+试着用 `->` 开头并在提示词中列出清晰的步骤清单（1. 做X，2. 做Y），模型遵循度更佳
+按 Shift+Tab 可快速切换当前模型的思考推理强度等级（Effort Level）
+类型报错堆积成山？运行 `omp cleanse`（或在会话中输入 /cleanse），并行子 Agent 会自动排查并修复代码！

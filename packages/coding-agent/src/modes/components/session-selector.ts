@@ -14,6 +14,7 @@ import {
 	visibleWidth,
 } from "@oh-my-pi/pi-tui";
 import { formatBytes } from "@oh-my-pi/pi-utils";
+import { t } from "../../i18n";
 import { theme } from "../../modes/theme/theme";
 import { matchesAppInterrupt, matchesSelectDown, matchesSelectUp } from "../../modes/utils/keybinding-matchers";
 import type { SessionInfo, SessionStatus } from "../../session/session-listing";
@@ -30,15 +31,15 @@ import { bottomBorder, OverlayPanel, row, topBorder } from "./overlay-box";
 function formatSessionStatus(status: SessionStatus | undefined): string | undefined {
 	switch (status) {
 		case "complete":
-			return theme.fg("success", `${theme.status.success} done`);
+			return theme.fg("success", `${theme.status.success} ${t("session.status_done", "done")}`);
 		case "interrupted":
-			return theme.fg("warning", `${theme.status.warning} interrupted`);
+			return theme.fg("warning", `${theme.status.warning} ${t("session.status_interrupted", "interrupted")}`);
 		case "aborted":
-			return theme.fg("muted", `${theme.status.aborted} aborted`);
+			return theme.fg("muted", `${theme.status.aborted} ${t("session.status_aborted", "aborted")}`);
 		case "error":
-			return theme.fg("error", `${theme.status.error} error`);
+			return theme.fg("error", `${theme.status.error} ${t("session.status_error", "error")}`);
 		case "pending":
-			return theme.fg("accent", `${theme.status.pending} pending`);
+			return theme.fg("accent", `${theme.status.pending} ${t("session.status_pending", "pending")}`);
 		default:
 			return undefined;
 	}
@@ -536,11 +537,11 @@ class SessionList implements Component {
 
 		if (this.#filteredSessions.length === 0) {
 			if (this.#showCwd) {
-				lines.push(truncateToWidth(theme.fg("muted", "No sessions found"), width));
+				lines.push(truncateToWidth(theme.fg("muted", t("session.empty", "No sessions found")), width));
 			} else {
 				// "Current folder" scope - hint to try "all"
 				lines.push(
-					truncateToWidth(theme.fg("muted", "No sessions in current folder. Press Tab to view all."), width),
+					truncateToWidth(theme.fg("muted", t("session.empty_folder", "No sessions in current folder. Press Tab to view all.")), width),
 				);
 			}
 			return lines;
@@ -827,7 +828,7 @@ export class SessionSelectorComponent extends OverlayPanel {
 		onExit: () => void,
 		options: SessionSelectorOptions = {},
 	) {
-		super(options.title ?? "Resume Session");
+		super(options.title ?? t("session.resume_title", "Resume Session"));
 
 		this.#messageContainer = new Container();
 		this.#onDelete = options.onDelete;
@@ -836,7 +837,7 @@ export class SessionSelectorComponent extends OverlayPanel {
 		this.#globalSessions = options.allSessions ?? null;
 		this.#getTerminalRows = options.getTerminalRows ?? (() => 24);
 		this.#fillHeight = options.fillHeight ?? false;
-		this.#title = options.title ?? "Resume Session";
+		this.#title = options.title ?? t("session.resume_title", "Resume Session");
 		this.#scopeLabel = options.scopeLabel;
 		this.title = this.#headerLabel();
 		// One spacer of breathing room; OverlayPanel supplies the two outer
@@ -883,7 +884,7 @@ export class SessionSelectorComponent extends OverlayPanel {
 
 	#headerLabel(): string {
 		if (this.#scopeLabel === false) return this.#title;
-		const scopeLabel = this.#scopeLabel ?? (this.#scope === "all" ? "all projects" : "current folder");
+		const scopeLabel = this.#scopeLabel ?? (this.#scope === "all" ? t("session.scope_all", "all projects") : t("session.scope_folder", "current folder"));
 		return `${this.#title} (${scopeLabel})`;
 	}
 
@@ -968,10 +969,10 @@ export class SessionSelectorComponent extends OverlayPanel {
 			this.#onRequestRender?.();
 		};
 		this.#confirmationDialog = new HookSelectorComponent(
-			`Delete session?\n${displayName}`,
-			["Yes", "No"],
+			`${t("session.confirm_delete", "Delete session?")}\n${displayName}`,
+			[t("common.yes", "Yes"), t("common.no", "No")],
 			async (option: string) => {
-				if (option === "Yes" && this.#onDelete) {
+				if ((option === "Yes" || option === t("common.yes", "Yes")) && this.#onDelete) {
 					this.#clearError();
 					try {
 						const deleted = await this.#onDelete(session);
@@ -1022,8 +1023,8 @@ export class SessionSelectorComponent extends OverlayPanel {
 
 	/** Blank · keybinding hint · bottom border. Rendered by {@link render}. */
 	#footerLines(width: number): string[] {
-		const scopeHint = this.#scope === "all" ? "current folder" : "all projects";
-		const hint = theme.fg("muted", `[Del/⌫ delete · Enter select · Tab ${scopeHint} · Esc cancel]`);
+		const scopeHint = this.#scope === "all" ? t("session.scope_folder", "current folder") : t("session.scope_all", "all projects");
+		const hint = theme.fg("muted", `[${t("session.key_delete", "Del/⌫ delete")} · ${t("session.key_select", "Enter select")} · Tab ${scopeHint} · ${t("session.key_cancel", "Esc cancel")}]`);
 		return [row("", width), row(hint, width), row("", width), bottomBorder(width)];
 	}
 

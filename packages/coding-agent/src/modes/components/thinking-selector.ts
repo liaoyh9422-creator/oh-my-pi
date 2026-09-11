@@ -1,5 +1,6 @@
 import type { Effort } from "@oh-my-pi/pi-ai";
 import { type SelectItem, SelectList, type SgrMouseEvent } from "@oh-my-pi/pi-tui";
+import { t } from "../../i18n";
 import { getSelectListTheme } from "../../modes/theme/theme";
 import { getThinkingLevelMetadata } from "../../thinking";
 import { OverlayPanel } from "./overlay-box";
@@ -17,7 +18,7 @@ export class ThinkingSelectorComponent extends OverlayPanel {
 		onSelect: (level: Effort) => void,
 		onCancel: () => void,
 	) {
-		super("Thinking Level");
+		super(t("thinking.title", "Thinking Level"));
 
 		const thinkingLevels: SelectItem[] = availableLevels.map(getThinkingLevelMetadata);
 
