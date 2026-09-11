@@ -1,0 +1,204 @@
+name: Build & Release Standalone Binary (Chinese UI)
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag name (e.g. v18.1.17-zh)'
+        required: false
+        default: 'v18.1.17-zh'
+      create_release:
+        description: 'Publish as GitHub Release'
+        type: boolean
+        default: true
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "Build ${{ matrix.target_id }}"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            target_id: linux-x64
+            platform: linux
+            arch: x64
+            binary_name: omp-linux-x64
+            smoke_test: true
+
+          - os: ubuntu-22.04
+            target_id: win32-x64
+            platform: win32
+            arch: x64
+            binary_name: omp-windows-x64.exe
+            smoke_test: false
+
+          - os: ubuntu-22.04
+            target_id: linux-arm64
+            platform: linux
+            arch: arm64
+            binary_name: omp-linux-arm64
+            smoke_test: false
+
+          - os: macos-14
+            target_id: darwin-arm64
+            platform: darwin
+            arch: arm64
+            binary_name: omp-darwin-arm64
+            smoke_test: true
+
+          - os: macos-14
+            target_id: darwin-x64
+            platform: darwin
+            arch: x64
+            binary_name: omp-darwin-x64
+            smoke_test: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.0"
+
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('**/bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Fetch prebuilt native addon from npm
+        shell: bash
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./packages/natives/package.json').version")
+          PKG="@oh-my-pi/pi-natives-${{ matrix.platform }}-${{ matrix.arch }}"
+          echo "Fetching native package $PKG@$VERSION..."
+          TARBALL=$(npm view "$PKG@$VERSION" dist.tarball)
+          echo "Downloading $TARBALL..."
+          TEMP_DIR=$(mktemp -d)
+          curl -fsSL --retry 3 "$TARBALL" | tar -xz -C "$TEMP_DIR"
+          mkdir -p packages/natives/native
+          cp "$TEMP_DIR"/package/*.node packages/natives/native/
+          ls -la packages/natives/native/*.node
+
+      - name: Build standalone binary
+        env:
+          RELEASE_TARGETS: ${{ matrix.target_id }}
+        run: bun run ci:release:build-binaries --targets=${{ matrix.target_id }}
+
+      - name: Smoke test binary
+        if: matrix.smoke_test
+        shell: bash
+        run: |
+          set -euo pipefail
+          BINARY="packages/coding-agent/binaries/${{ matrix.binary_name }}"
+          chmod +x "$BINARY"
+          TEST_DIR=$(mktemp -d)
+          HOME="$TEST_DIR/home" XDG_DATA_HOME="$TEST_DIR/xdg" "$BINARY" --version
+          HOME="$TEST_DIR/home" XDG_DATA_HOME="$TEST_DIR/xdg" "$BINARY" --smoke-test
+          echo "Smoke test passed successfully for ${{ matrix.target_id }}!"
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.binary_name }}
+          path: packages/coding-agent/binaries/${{ matrix.binary_name }}
+          if-no-files-found: error
+          retention-days: 14
+
+  publish_release:
+    name: Publish GitHub Release
+    needs: [build]
+    if: always() && !cancelled() && needs.build.result == 'success' && (startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true' || github.event.inputs.create_release == true)
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all binary artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-binaries
+          merge-multiple: true
+
+      - name: Prepare release assets and generate checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          cp release-binaries/* dist/
+          chmod +x dist/omp-* 2>/dev/null || true
+          cd dist
+          sha256sum * > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          cd ..
+
+      - name: Determine tag name
+        id: tag_info
+        shell: bash
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            TAG="${{ github.event.inputs.release_tag }}"
+            [ -z "$TAG" ] && TAG="v18.1.17-zh"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag_info.outputs.tag }}
+          name: "Oh My Pi ${{ steps.tag_info.outputs.tag }} (中文版 / Chinese Localization)"
+          draft: false
+          prerelease: false
+          files: |
+            dist/*
+          body: |
+            ### Oh My Pi 中文汉化独立预编译版本 (Standalone Binary)
+
+            本版本包含了 Oh My Pi (`omp`) 命令行与 TUI 终端界面的完整简体中文汉化。直接下载对应架构的可执行二进制文件即可使用，**无需安装 Node.js、Bun 或 Rust 编译环境**。
+
+            #### 📦 包含的二进制资产：
+            - `omp-linux-x64`：Linux x86_64（主流服务器与桌面 Ubuntu, Debian, CentOS, Arch 等）
+            - `omp-linux-arm64`：Linux ARM64（树莓派、各类 ARM 云服务器）
+            - `omp-darwin-arm64`：macOS Apple Silicon（M1 / M2 / M3 / M4 系列）
+            - `omp-darwin-x64`：macOS Intel 芯片架构
+            - `omp-windows-x64.exe`：Windows 64位独立可执行文件
+            - `SHA256SUMS.txt`：各平台二进制校验和文件
+
+            #### 🚀 Linux / macOS 快速安装与替换：
+            ```bash
+            # 1. 下载对应架构二进制（以 Linux x64 为例）
+            curl -L -o /tmp/omp https://github.com/${{ github.repository }}/releases/download/${{ steps.tag_info.outputs.tag }}/omp-linux-x64
+            chmod +x /tmp/omp
+
+            # 2. 备份原有二进制并替换
+            [ -f /usr/local/bin/omp ] && sudo cp /usr/local/bin/omp /usr/local/bin/omp.bak
+            sudo mv /tmp/omp /usr/local/bin/omp
+
+            # 3. 验证运行
+            omp --version
+            ```
+
+            #### 🇨🇳 汉化范围说明：
+            - **界面汉化**：启动欢迎页、新手交互式配置引导（10个完整阶段向导）、40+ 斜杠命令说明、所有对话框、Plan/历史/主题/模型等各选择器列表。
+            - **稳定性保障**：LLM Prompts、Tool Schema 与 Rust 底层核心保持原生，不影响任何模型调用及工具链兼容性。
